@@ -1,0 +1,117 @@
+:root {
+  --cm-primary: #1f6feb;
+  --cm-primary-deep: #1558c0;
+  --cm-primary-light: #eaf2ff;
+  --cm-gold: #ffc53d;
+  --cm-text: #262626;
+  --cm-text-sub: #8c8c8c;
+  --cm-bg: #f5f6f8;
+  --cm-danger: #e02e24;
+
+  /* Element Plus 主色对齐海洋蓝主题 */
+  --el-color-primary: #1f6feb;
+  --el-color-primary-dark-2: #1558c0;
+  --el-color-primary-light-3: #649bf2;
+  --el-color-primary-light-5: #8fb5f5;
+  --el-color-primary-light-7: #bcd4fa;
+  --el-color-primary-light-8: #d3e2fc;
+  --el-color-primary-light-9: #eaf2ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--cm-bg);
+  color: var(--cm-text);
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.page-main {
+  max-width: 1100px;
+  margin: 16px auto 40px;
+  padding: 0 16px;
+  min-height: calc(100vh - 150px);
+}
+
+.page-footer {
+  text-align: center;
+  color: var(--cm-text-sub);
+  font-size: 12px;
+  padding: 18px 0 26px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.emoji-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #dcecfe, #b9d7fd);
+  border-radius: 14px;
+  font-size: 34px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.price {
+  color: var(--cm-danger);
+  font-weight: 700;
+}
+
+.price-symbol {
+  font-size: 0.7em;
+  margin-right: 1px;
+}
+
+.text-sub {
+  color: var(--cm-text-sub);
+  font-size: 12px;
+}
+
+.cm-btn-primary {
+  background: linear-gradient(90deg, var(--cm-primary), var(--cm-primary-deep)) !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.cm-btn-primary:disabled {
+  background: #b9d7fd !important;
+}
+
+.head-tip {
+  background: var(--cm-primary-light);
+  border: 1px solid #cfe2ff;
+  color: #0b3ea8;
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.more-link {
+  font-size: 13px;
+  color: var(--cm-primary-deep);
+  text-decoration: none;
+  cursor: pointer;
+}

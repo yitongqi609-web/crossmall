@@ -1,0 +1,56 @@
+server:
+  port: 8582
+
+spring:
+  application:
+    name: crossmall
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3311/crossmall?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root123
+  data:
+    redis:
+      host: localhost
+      port: 6391
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+    db-config:
+      id-type: assign_id
+
+rocketmq:
+  name-server: 127.0.0.1:9882
+  producer:
+    group: crossmall-producer
+    send-message-timeout: 5000
+
+knife4j:
+  enable: true
+
+springdoc:
+  default-flat-param-object: true
+
+crossmall:
+  jwt:
+    # HS256 密钥(>=32 字节)
+    secret: crossmall-tidemall-jwt-secret-key-2026
+    expire-hours: 72
+  pay:
+    # 模拟支付网关回调验签密钥
+    mock-gateway-secret: cm-mock-pay-gateway-secret-2026
+  order:
+    # 支付超时关单时长(ISO-8601,冒烟测试可用 PT45S 覆盖)
+    pay-timeout: PT30M
+  fx:
+    # 汇率定时拉取(cron):每 2 小时模拟一次第三方汇率源
+    pull-cron: "0 0 */2 * * ?"
+  topic:
+    order-close: crossmall-order-close-topic
+    order-track: crossmall-order-track-topic

@@ -1,0 +1,20 @@
+# Java
+backend/target/
+*.class
+*.log
+hs_err_pid*
+
+# Node
+frontend/node_modules/
+frontend/dist/
+*.local
+
+# Docker volumes
+docker/mysql/data/
+docker/redis/data/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
