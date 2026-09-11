@@ -17,18 +17,19 @@
 
 - [项目简介](#一项目简介)
 - [为什么不是又一个商城 Demo](#二为什么不是又一个商城-demo)
-- [功能总览](#三功能总览)
-- [架构设计](#四架构设计)
-- [核心设计与权衡](#五核心设计与权衡)
-- [数据模型](#六数据模型)
-- [快速启动](#七快速启动)
-- [演示账号](#八演示账号)
-- [配置说明](#九配置说明)
-- [接口文档](#十接口文档)
-- [冒烟测试](#十一冒烟测试)
-- [项目结构](#十二项目结构)
-- [常见问题 FAQ](#十三常见问题-faq)
-- [Roadmap](#十四roadmap)
+- [项目预览](#三项目预览)
+- [功能总览](#四功能总览)
+- [架构设计](#五架构设计)
+- [核心设计与权衡](#六核心设计与权衡)
+- [数据模型](#七数据模型)
+- [快速启动](#八快速启动)
+- [演示账号](#九演示账号)
+- [配置说明](#十配置说明)
+- [接口文档](#十一接口文档)
+- [冒烟测试](#十二冒烟测试)
+- [项目结构](#十三项目结构)
+- [常见问题 FAQ](#十四常见问题-faq)
+- [Roadmap](#十五roadmap)
 
 ---
 
@@ -58,7 +59,46 @@ CrossMall(潮汐全球购 TideMall)是一个面向海外消费者的 **B2C 跨�
 | 支付网关必然重试回调 | **三重幂等**:验签 → Redis SETNX → 流水条件更新,金额校验防篡改 | 真实支付场景的第一原则 |
 | 多币种金额精度 | 全链路 **BIGINT 分存储 + USD 基准币**,换算只在出入口发生 | 浮点误差在财务场景是事故 |
 
-## 三、功能总览
+## 三、项目预览
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/home.png" alt="商城首页" /></td>
+    <td width="50%"><img src="docs/screenshots/goods-detail.png" alt="商品详情" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>商城首页 · 分类/热销/币种切换</sub></td>
+    <td align="center"><sub>商品详情 · SKU 规格 · 双语</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/checkout.png" alt="结算试算" /></td>
+    <td><img src="docs/screenshots/cashier.png" alt="模拟收银台" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>结算试算 · 运费/关税/汇率三段明细</sub></td>
+    <td align="center"><sub>模拟收银台 · 双通道 · 支付倒计时</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/order-track.png" alt="订单履约轨迹" /></td>
+    <td><img src="docs/screenshots/login.png" alt="登录页" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>订单详情 · 履约轨迹时间线 · 汇率快照</sub></td>
+    <td align="center"><sub>登录页 · 品牌区 + 演示账号一键填充</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/admin-dashboard.png" alt="数据看板" /></td>
+    <td><img src="docs/screenshots/admin-order.png" alt="订单履约操作台" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>管理看板 · GMV/趋势/状态分布/热销 Top5</sub></td>
+    <td align="center"><sub>订单履约操作台 · 状态机流转按钮</sub></td>
+  </tr>
+</table>
+
+---
+
+## 四、功能总览
 
 ### 用户端(中/英双语,6 币种实时切换)
 
@@ -77,7 +117,7 @@ CrossMall(潮汐全球购 TideMall)是一个面向海外消费者的 **B2C 跨�
 - 🧭 分类管理 / 💱 汇率管理(手动改价 + 模拟第三方定时拉取,缓存自动失效)/ 🛃 关税税则 / 🚚 物流线路
 - 🧾 订单履约操作台:按状态筛选 → 详情抽屉 → 依据状态机渲染的下一步流转按钮(备货/报关/启运/清关/派送/妥投/发货前退款)+ 轨迹时间线 + **超时关单兜底对账**
 
-## 四、架构设计
+## 五、架构设计
 
 ```
                  ┌─────────────────────────────────────────────────────┐
@@ -103,9 +143,9 @@ CrossMall(潮汐全球购 TideMall)是一个面向海外消费者的 **B2C 跨�
 
 **分层约定**:Controller(参数校验)→ Service(业务编排)→ Mapper(MyBatis-Plus);`fulfillment` 包独立承载状态机,`mq` 包隔离消息生产/消费,第三方集成(支付网关/汇率源)均以独立 Controller/Task 隔离,可平滑替换为真实实现。
 
-## 五、核心设计与权衡
+## 六、核心设计与权衡
 
-### 5.1 多币种与汇率快照 💱
+### 6.1 多币种与汇率快照 💱
 
 - SKU 只存基准币 **USD 分**(BIGINT),展示价由汇率服务实时换算,前端 6 币种切换
 - 汇率服务:Redis 读穿透缓存(TTL 2h)+ 内存币种表(符号等只读信息)+ 定时模拟第三方拉取(±0.5% 随机游走)
@@ -120,14 +160,14 @@ order.setTotalLocalCents(fxService.convert(...)); // 本币应付(快照折算)
 
 > **权衡**:快照导致同一商品在不同订单可能单价不同——这是刻意的,跨境财务对账要求"订单金额永远等于成交时点金额"。
 
-### 5.2 关税与运费试算 🛃
+### 6.2 关税与运费试算 🛃
 
 - 税则匹配三级降级:`(国家, HS)` → `(国家, *)` → `(全球 *, *)`,任何目的国都有兜底税率
 - **de minimis 免税额度**:商品申报总额低于该国额度时整单免税(美 $800、日 $100、澳 AUD1000)
 - 运费:`首重费 + ceil(超出重量/续重单位) × 续重费`,线路按目的国过滤,结算页多线路比价
 - 简化约定:税基 = 商品总额(不含运费),多品类订单按品类税率分别计税后求和
 
-### 5.3 履约状态机 🚚
+### 6.3 履约状态机 🚚
 
 ```java
 private static final Map<OrderStatus, Set<OrderStatus>> TRANSITIONS = Map.of(
@@ -144,7 +184,7 @@ private static final Map<OrderStatus, Set<OrderStatus>> TRANSITIONS = Map.of(
 - **合法流转表是唯一真相源**,配合 `UPDATE ... WHERE status = 期望值` 条件更新双保险:非法跳状态直接拒绝,并发操作下条件更新失败的请求视为过期请求
 - 每次流转发送 MQ 轨迹消息异步落库(含双语描述与节点地点),主链路不因轨迹写放大变慢
 
-### 5.4 支付三重幂等 💳
+### 6.4 支付三重幂等 💳
 
 ```
 回调 → ① 验签 MD5(txnNo|amount|secret)      防伪造
@@ -156,14 +196,14 @@ private static final Map<OrderStatus, Set<OrderStatus>> TRANSITIONS = Map.of(
 
 > **权衡**:用「结果对象」而非异常返回业务失败,避免误回滚已落库的流水状态。
 
-### 5.5 超时关单 ⏰
+### 6.5 超时关单 ⏰
 
 - 下单事务 **提交后(afterCommit)** 才发 RocketMQ 延迟消息——避免消息先于订单落库被消费
 - 延迟等级向上取整(如 45s → 1m 等级),保证消息永不早于截止时间到达
 - 关单与支付回调并发:两者都对订单做条件更新 `WHERE status = PENDING_PAYMENT`,**谁先谁赢,输方自动补偿**
 - 双保险:MQ 消息之外提供「兜底对账」扫描过期订单(管理端手动 + 可定时),防消息丢失
 
-### 5.6 库存三层防超卖 📦
+### 6.6 库存三层防超卖 📦
 
 ```
 ① Redis Lua 原子预扣(判存+扣减一体,挡量快速失败)
@@ -173,7 +213,7 @@ private static final Map<OrderStatus, Set<OrderStatus>> TRANSITIONS = Map.of(
 
 > Redis 只是"闸门"不是账本;30 并发下单实测:成功笔数 ≤ 库存,取消后库存分毫不差。
 
-## 六、数据模型
+## 七、数据模型
 
 13 张核心表(MySQL 8.4,utf8mb4):
 
@@ -189,7 +229,7 @@ private static final Map<OrderStatus, Set<OrderStatus>> TRANSITIONS = Map.of(
 | `order_track` | 履约轨迹 | 每次状态流转一条,双语描述,由 MQ 消费者异步写入 |
 | `user` / `address` / `admin_user` / `category` | 基础 | 地址含 ISO2 国家码,支持国际格式 |
 
-## 七、快速启动
+## 八、快速启动
 
 ### 环境要求
 
@@ -251,7 +291,7 @@ cd .. && docker compose up -d frontend
 | 前端(dev) | **5175** | `/api` 代理到 8582 |
 | 前端(nginx) | **8091** | 可选 |
 
-## 八、演示账号
+## 九、演示账号
 
 | 端 | 账号 | 密码 | 说明 |
 |---|---|---|---|
@@ -260,7 +300,7 @@ cd .. && docker compose up -d frontend
 
 > 种子数据包含 20 个双语商品(43 SKU)、6 币种汇率、14 条关税税则、4 条物流线路。
 
-## 九、配置说明
+## 十、配置说明
 
 关键配置在 `backend/src/main/resources/application.yml`,全部支持启动参数覆盖:
 
@@ -283,7 +323,7 @@ java -jar target/crossmall-backend-1.0.0.jar --crossmall.order.pay-timeout=PT20S
 
 **Redis 依赖说明**:库存闸门在应用启动时自动从 DB 预热(SET NX);汇率缓存失效策略为写操作主动删除 + TTL 兜底。
 
-## 十、接口文档
+## 十一、接口文档
 
 启动后端后访问 Knife4j 文档:<http://localhost:8582/doc.html>(支持 Authorize 填 Bearer Token)
 
@@ -299,7 +339,7 @@ java -jar target/crossmall-backend-1.0.0.jar --crossmall.order.pay-timeout=PT20S
 | 模拟网关 | `/api/mock/pay` | 收银台确认 + 回调 Webhook(可重放验证幂等) |
 | 管理端 | `/api/admin/*` | 登录/商品/分类/汇率/税则/线路/履约/看板 |
 
-## 十一、冒烟测试
+## 十二、冒烟测试
 
 ```bash
 pip install requests
@@ -317,7 +357,7 @@ python scripts/smoke_test.py          # BASE=http://localhost:8582 可覆盖
 - **30 并发下单防超卖**:成功笔数 ≤ 库存,取消后库存恢复一致
 - 兜底关单、汇率模拟拉取、看板数据
 
-## 十二、项目结构
+## 十三、项目结构
 
 ```
 crossmall
@@ -344,11 +384,12 @@ crossmall
 │   ├── mysql/init            # 01_schema.sql + 02_seed.sql(自动执行)
 │   └── rocketmq/broker.conf
 ├── scripts/smoke_test.py     # 42 项冒烟断言
+├── docs/screenshots          # 项目截图(README 预览图)
 ├── docker-compose.yml
 └── README.md
 ```
 
-## 十三、常见问题 FAQ
+## 十四、常见问题 FAQ
 
 **Q1:启动时报端口被占用?**
 本项目所有端口均与常见默认值错开(见端口清单)。可用 `netstat -ano | findstr <端口>` 排查占用进程;Broker 监听端口固定 21911(在 `docker/rocketmq/broker.conf` 的 `listenPort`),修改时需同步 compose 映射。
@@ -373,7 +414,7 @@ Windows 下 MySQL 容器初始化会话默认 latin1 客户端字符集,中文�
 **Q6:管理端把状态推错了怎么办?**
 状态机合法流转表会拒绝非法跳转;若已流转到下一节点,无法回退(符合真实履约语义),退款仅在发货前(PAID 状态)允许。
 
-## 十四、Roadmap
+## 十五、Roadmap
 
 - [ ] 接入 Stripe / PayPal 沙箱,替换模拟收银台
 - [ ] 对接真实汇率源(openexchangerates)与失败降级告警
